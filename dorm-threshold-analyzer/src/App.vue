@@ -179,7 +179,7 @@ ${不及格宿舍.join('、') || '无'}`}
     </div>
 
     <div class="upload">
-      <input type="file" accept="text/csv" @change="changeFile">
+      <input type="file" accept="text/csv,.csv" @change="changeFile">
     </div>
 
     <div class="result-template">
