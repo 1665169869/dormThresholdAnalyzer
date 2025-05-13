@@ -9,7 +9,7 @@ const threshold = {
   // 小于等于该值，则该宿舍需整改
   "violationThresholds": {
     "垃圾未倒": 0,
-    "厕所": 1,
+    "厕所": 0,
     "用电安全": 10
   },
 
@@ -21,7 +21,8 @@ const threshold = {
     "良好宿舍": {
       "minScore": 83,
       "maxScore": 85
-    }
+    },
+    "不及格宿舍": 70
   }
 }
 
@@ -89,7 +90,6 @@ const changeFile = async (e) => {
   }
 
   const 优秀宿舍 = [];
-  const 较优秀宿舍 = [];
   const 良好宿舍 = [];
   const 未倒垃圾宿舍 = [];
   // 包括但不限于风扇、排插、灯泡
@@ -103,17 +103,13 @@ const changeFile = async (e) => {
       const item = floorGroups[floor][i];
       // 排列前五优秀宿舍，其余宿舍添加到较优秀宿舍
       if (item.宿舍总分 >= threshold.hygieneCategories.优秀宿舍.minScore) {
-        if (i < 5) {
-          优秀宿舍.push(item.宿舍号);
-        } else {
-          较优秀宿舍.push(item.宿舍号);
-        }
+        优秀宿舍.push(item.宿舍号);
       } else if (
         item.宿舍总分 < threshold.hygieneCategories.良好宿舍.maxScore &&
         item.宿舍总分 >= threshold.hygieneCategories.良好宿舍.minScore
       ) {
         良好宿舍.push(item.宿舍号);
-      } else if (item.宿舍总分 < 60) {
+      } else if (item.宿舍总分 < threshold.hygieneCategories.不及格宿舍) {
         不及格宿舍.push(item.宿舍号);
       }
 
@@ -137,26 +133,22 @@ const changeFile = async (e) => {
   const 通报内容 = `
 【${formattedDate}宿舍内务检查情况通报】
 
-🏆 优秀宿舍（地面整洁/物品规范/无违规电器）：
+🏆 优秀宿舍（地面整洁/物品规范/无违规电器）85分以上：
 ${优秀宿舍.join('、') || '无'}
 
-🏆 较优秀宿舍（地面整洁/无违规电器）：
-${较优秀宿舍.join('、') || '无'}
-
-✨ 良好宿舍（基本达标，存在个别细节问题）：
+✨ 良好宿舍（基本达标，存在个别细节问题）83-85分的：
 ${良好宿舍.join('、') || '无'}
 
-⚠ 需整改宿舍（未倒垃圾）：
+⚠ 需整改宿舍（未倒垃圾）0分：
 ${未倒垃圾宿舍.join('、') || '无'}
 
-⚠ 需整改宿舍（未关电源/灯/排风/风扇）：
+⚠ 需整改宿舍（未关电源/灯/排风/风扇）10分及以下：
 ${未关电宿舍.join('、') || '无'}
 
-⚠ 需整改宿舍（厕所不达标）：
+⚠ 需整改宿舍（厕所不达标）0分：
 ${厕所不达标宿舍.join('、') || '无'}
-
 ${不及格宿舍.length == 0 ? '' : `
-❌未及格宿舍（分数不达标）：
+❌未及格宿舍（宿舍卫生不达标）低于70分：
 ${不及格宿舍.join('、') || '无'}`}
 
 （请相关宿舍于今日18:00前完成整改）`;
